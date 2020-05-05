@@ -80,12 +80,6 @@ def Loginer():
     
     
 
-def csrf():
-    r = requests.get("https://www.instagram.com/")
-    x = re.search("csrftoken=(.*?);", r.headers['set-cookie'])
-    return x[1]
-
-
 def login(username, password):
     postdata = {
         'username': username,
@@ -94,25 +88,19 @@ def login(username, password):
 
     xheaders = {
         'accept': '*/*',
-        'accept-encoding': 'gzip, deflate, br',
         'accept-language': 'en-US,en;q=0.9',
         'content-type': 'application/x-www-form-urlencoded',
-        'origin': 'https://www.instagram.com',
-        'referer': 'https://www.instagram.com/accounts/login/ajax/',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-        'x-csrftoken': csrf(),
-        'x-instagram-ajax': '1',
+        'x-csrftoken': 'missing',
         'x-requested-with': 'XMLHttpRequest'
     }
 
     r = requests.post("https://www.instagram.com/accounts/login/ajax/", data=postdata, headers=xheaders)
     if "authenticated\": true" in r.text:
-        global token, xid, cookies
-        token = re.search("csrftoken=(.*?);", r.headers['set-cookie'])[1]
+        global xid, cookies
         session = re.search("sessionid=(.*?);", r.headers['set-cookie'])[1]
         xid = re.search("ds_user_id=(.*?);", r.headers['set-cookie'])[1]
-        mid = re.search("mid=(.*?);", r.headers['set-cookie'])[1]
-        cookies = "csrftoken=" + token + "; sessionid=" + session + "; ds_user_id=" + xid + "; mid=" + mid + ";"
+        cookies = "csrftoken=missing; sessionid=" + session + "; ds_user_id=" + xid + "; mid=missing;"
         return True
     else:
         print(r.text)
@@ -136,10 +124,9 @@ def GetFollowers():
             'Accept': '*/*',
             'X-Requested-With': 'XMLHttpRequest',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; 69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-            'X-CSRFToken': token,
+            'X-CSRFToken': 'missing',
             'Accept-Language': 'en-US,en;q=0.9',
             'Cookie': cookies,
-            'Accept-Encoding': 'gzip, deflate',
         }
             request = requests.get('https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={"id":"' + xid + '","include_reel":true,"fetch_mutual":true,"first":50}', headers=xheaders)
             response = request.text
@@ -181,12 +168,11 @@ def Block(id):
         'Accept': '*/*',
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-        'X-CSRFToken': token,
+        'X-CSRFToken': 'missing',
         'Accept-Language': 'en-US,en;q=0.9',
         'Cookie': cookies,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept-Encoding': 'gzip, deflate'
-    }
+           }
         request = requests.post('https://www.instagram.com/web/friendships/' + id + '/block/', headers=xheaders, data="")
         if "ok" in request.text:
             return True
@@ -201,11 +187,10 @@ def UnBlock(id):
         'Accept': '*/*',
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-        'X-CSRFToken': token,
+        'X-CSRFToken': 'missing',
         'Accept-Language': 'en-US,en;q=0.9',
         'Cookie': cookies,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept-Encoding': 'gzip, deflate'
     }
         request = requests.post('https://www.instagram.com/web/friendships/' + id + '/unblock/', headers=xheaders, data="")
         if "ok" in request.text:
@@ -235,10 +220,9 @@ def GetFollowing():
             'Accept': '*/*',
             'X-Requested-With': 'XMLHttpRequest',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-            'X-CSRFToken': token,
+            'X-CSRFToken': 'missing',
             'Accept-Language': 'en-US,en;q=0.9',
             'Cookie': cookies,
-            'Accept-Encoding': 'gzip, deflate'
             }
             request = requests.get('https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables={"id":"' + xid + '","include_reel":true,"fetch_mutual":false,"first":50}', headers=xheaders)
             response = request.text
@@ -272,11 +256,10 @@ def UnFollow(id):
         'Accept': '*/*',
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-        'X-CSRFToken': token,
+        'X-CSRFToken': 'missing',
         'Accept-Language': 'en-US,en;q=0.9',
         'Cookie': cookies,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept-Encoding': 'gzip, deflate'
     }
         request = requests.post('https://www.instagram.com/web/friendships/' + id + '/unfollow/', headers=xheaders, data="")
         if "ok" in request.text:
@@ -303,10 +286,10 @@ def GetSaves():
             'Accept': '*/*',
             'X-Requested-With': 'XMLHttpRequest',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-            'X-CSRFToken': token,
+            'X-CSRFToken': 'missing',
             'Accept-Language': 'en-US,en;q=0.9',
             'Cookie': cookies,
-            'Accept-Encoding': 'gzip, deflate'
+
         }
             request = requests.get('https://www.instagram.com/graphql/query/?query_hash=8c86fed24fa03a8a2eea2a70a80c7b6b&variables={"id":"' + xid + '","first":50}', headers=xheaders)
             response = request.text
@@ -340,11 +323,10 @@ def UnSave(id):
         'Accept': '*/*',
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-        'X-CSRFToken': token,
+        'X-CSRFToken': 'missing',
         'Accept-Language': 'en-US,en;q=0.9',
         'Cookie': cookies,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept-Encoding': 'gzip, deflate'
     }
         request = requests.post('https://www.instagram.com/web/save/' + id + '/unsave/', headers=xheaders, data="")
         if "ok" in request.text:
@@ -400,11 +382,10 @@ def DeletePost(id):
         'Accept': '*/*',
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-        'X-CSRFToken': token,
+        'X-CSRFToken': 'missing',
         'Accept-Language': 'en-US,en;q=0.9',
         'Cookie': cookies,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept-Encoding': 'gzip, deflate'
     }
         request = requests.post('https://www.instagram.com/create/' + id + '/delete/', headers=xheaders, data="")
         if "ok" in request.text:
@@ -430,19 +411,13 @@ def GetDM():
         try:
             xheaders = {
             'Host': 'www.instagram.com',
-            'Connection': 'keep-alive',
             'Accept': '*/*',
-            'X-IG-WWW-Claim': 'hmac.AR3MtywBVNg17GlCAMq55oS44fahU4yNozJHQ6XB_pNbBKH4',
             'X-Requested-With': 'XMLHttpRequest',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-            'X-IG-App-ID': '936619743392459',
-            'Sec-Fetch-Site': 'same-origin',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Dest': 'empty',
             'Referer': 'https://www.instagram.com/direct/inbox/',
             'Accept-Language': 'en-US,en;q=0.9',
             'Cookie': cookies,
-            'Accept-Encoding': 'gzip, deflate'
+
             }
             request = requests.get('https://www.instagram.com/direct_v2/web/inbox/?persistentBadging=true&folder=&limit=100', headers=xheaders)
             response = request.text
@@ -471,23 +446,13 @@ def DeleteDM(id):
     try:
         xheaders = {
             'Host': 'www.instagram.com',
-            'X-IG-WWW-Claim': 'hmac.AR0Qw37N-Mgq8qSnHw19u3PjFYJw5WTJ8T4gMgJKTH4IMsNL',
-            'X-Instagram-AJAX': '621e3ac6dcc0',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': '*/*',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win69; x69) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRFToken': token,
-            'X-IG-App-ID': '936619743392459',
-            'Origin': 'https://www.instagram.com',
-            'Sec-Fetch-Site': 'same-origin',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Dest': 'empty',
-            'Referer': 'https://www.instagram.com/direct/inbox/',
+            'X-CSRFToken': 'missing',
             'Accept-Language': 'en-US,en;q=0.9',
             'Cookie': cookies,
-            'Accept-Encoding': 'gzip, deflate'
-
         }
         request = requests.post('https://www.instagram.com/direct_v2/web/threads/' + id + '/hide/', headers=xheaders, data="")
         if "ok" in request.text:
